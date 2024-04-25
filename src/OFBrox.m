@@ -1,5 +1,6 @@
 function [D of] = OFBrox(A, sigma, alpha, gamma)
-addpath .\Brox\
+
+addpath .\extrn\
 if ~exist('sigma')
     sigma = 0.5;
 end

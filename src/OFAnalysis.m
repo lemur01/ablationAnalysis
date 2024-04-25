@@ -6,28 +6,33 @@ ofs = 5         % offset for visualisation of quivers
 qscale = 4;
 delta = 3       % time resolution - compute flow every delta frame
 w = 12          % window size for basic Lukas Kanade
-codeBrox =1     % select the code in Brox if ~=0
+codeBrox = 1    % select the code in Brox if ~=0
 totT = 30       % analyse first tot timepoinmts at most
 %% Data 
 
 % folder with input data
-folder = "..\Data"
+folder = "..\data"
 
 % result folder
 resF = fullfile(folder,'Results')
 mkdir(resF)
 
 % pattern of files to be analysed
-pattern = 'DV*'; % select files that match the pattern
+pattern = '*.tif'; % select files that match the pattern
 
 % files
 fn = dir(fullfile(folder, pattern));
-
-for k = 3:length(fn)
+summary =  [];
+for k = 1:length(fn)
     if (isempty(strfind(fn(k).name, 'PMT')))
         
     % read image with cut position
     cutIm = imread(fullfile(fn(k).folder,fn(k).name));
+    if isempty(findstr(fn(k).name,'AP'))
+        dv = 1;
+    else
+        dv = 0;
+    end
     % read data
     ch1V = Read3d(fullfile(fn(k).folder,strcat(strtok(fn(k).name, '.'), 'PMT - PMT [560-] _C1.ome.tif')));
     
@@ -102,8 +107,7 @@ for k = 3:length(fn)
     % compute orientation of the cit
     Or = regionprops(mask1, 'Orientation');
 
-    % Since 0,0 i top ;egft in the image it seems the code below is
-    % necessary to compute normal;
+    % Since 0,0 is top left in the image 
     Or.Orientation = -Or.Orientation
     if Or.Orientation>0
         gamma = deg2rad(Or.Orientation-90);
@@ -127,7 +131,7 @@ for k = 3:length(fn)
         [bp1y bp1x] = find(bwperim(mask1)>0);
         [bp2y bp2x] = find(bwperim(mask2)>0);
         
-        clear DA DetA BA noiseA waveA
+        clear DA DetA BA noiseA waveA T
 
         screen_dim=get(0, 'MonitorPositions');
         mainGUI_pos=[10 10 1920/2 1200/2];
@@ -137,8 +141,8 @@ for k = 3:length(fn)
         close all
    
         filename = fullfile(resF, strcat(strtok(fn(k).name, '.'), '.csv')); 
-        fileID = fopen(filename,'wt');
-        fprintf(fileID, '%s\n', 'File, Time, mean_all_disp_left, mean_all_disp_right, mean_bright_disp_left,mean_bright_disp_right');
+        %fileID = fopen(filename,'wt');
+        %fprintf(fileID, '%s\n', 'File, Time, mean_all_disp_left, mean_all_disp_right, mean_bright_disp_left,mean_bright_disp_right');
         for z = delta:delta:min(totT,size(A,3)-delta )%size(A,3)-delta 
             z
             close all
@@ -152,14 +156,16 @@ for k = 3:length(fn)
                 uu = D{1}(:,:,1);
                 vv = D{1}(:,:,2);
             else
-                [uu vv] = LucasKanade(aa, w);
+                [uu vv] = LucasKanade(sum(A(:,:,z-delta+1:z),3), sum(A(:,:,z+1:z+delta),3), w);
             end
+
             % compute the flow orthogonal to the cut
             Vperp = uu(:)*cos(gamma)+vv(:)*sin(gamma);
 
             all_left = mean(Vperp(maskstat(1).PixelIdxList));
             all_right = mean(Vperp(maskstat(2).PixelIdxList));
-
+            
+            % create mask of bright signal
             [DA(:,:,z) DetA(:,:,z) BA noiseA waveA] = FindPeakWav(sum(A(:,:,z+1:z+delta),3), 0.05, 0, 3, 2, 1); 
             DetA(:,:,z) = bwareaopen(DetA(:,:,z),5);
             DetA(:,:,z) = imclose(DetA(:,:,z), strel('disk',3));
@@ -170,7 +176,7 @@ for k = 3:length(fn)
             id = find(aux(maskstat(2).PixelIdxList)>0);
             sel_right = mean(Vperp(maskstat(2).PixelIdxList(id)));
 
-            h= figure('WindowState','maximized');%'units','normalized','outerposition',[0 0 1 1]);
+            h= figure('WindowState','maximized');
             reset(h)
             clf
             imshowpair(aa(:,:,1),aa(:,:,2)); hold on; axis equal tight
@@ -178,7 +184,7 @@ for k = 3:length(fn)
             [xx yy] = meshgrid(1:ofs:size(A,2),1:ofs:size(A,1));
             u2 = interp2(reshape(Vperp*cos(gamma), size(aux)), xx, yy);
             v2 = interp2(reshape(Vperp*sin(gamma), size(aux)), xx, yy);
-            h1 = quiver(xx,yy,u2,v2, 0, 'm', 'AutoScale', 'on','AutoScaleFactor', 3);
+            h1 = quiver(xx,yy,u2,v2, 0, 'm', 'AutoScale', 'on','AutoScaleFactor', qscale);
             hold on
             hU = get(h1,'UData') ;
             hV = get(h1,'VData') ;
@@ -187,11 +193,17 @@ for k = 3:length(fn)
             plot(xy_long(:,1),xy_long(:,2),'LineWidth',0.75, 'Color', 'c', 'LineStyle', '--');%'Color',[163,193,173]/255); % DarkTeal
             plot(bp2x, bp2y, 'c.','MarkerSize',6);%, 'Color', clr(2,:));%, 'Marker','-')
             print(h, fullfile(resF, strcat(strtok(fn(k).name, '.'), '_Proj',sprintf('%03d', z+1), '.png')),'-dpng');
-            fprintf(fileID, '%s, %d, %f, %f, %f, %f \n',strtok(fn(k).name, '.'), z+1, all_left,all_right,sel_left,sel_right);    
+            
+            % create result summary
+            
+            emb = regexp(fn(k).name,'\d*','Match');
+            summary = [summary; str2num(emb{1}),  z+1, all_left,all_right,sel_left,sel_right, dv];
             pause(0.3)
         end
-        fclose(fileID);
+        
     end
     end
 end
+T = array2table(summary, 'VariableNames',{'Embryo','Time','allLeft','allRight','brightLeft','brightRight', 'dv_ap'})
+writetable(T, fullfile(resF, 'Summary.csv'));
 
