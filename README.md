@@ -11,11 +11,13 @@ Mean values inside the ROI are computed (for all and for bright pixels) and  wri
 
 <img src=src/OF.png width="300" height="300"><img src=src/quiver2.png width="300" height="300">
 
-This code was used in
+This code was used for:
+
 Guy B. Blanchard, Elena Scarpa, Leila Muresan, Bénédicte Sanson
 Mechanical stress combines with planar polarised patterning during metaphase to orient embryonic epithelial cell divisions
 doi: https://doi.org/10.1101/2023.07.12.548728
 
+The code was tested with Matlab 2022a. An exmple dataset is provided to be run with the script OFAnalysis.m . 
 
 ### external dependency
 The source code provided in the folder extrn belongs to Visesh Chari.
