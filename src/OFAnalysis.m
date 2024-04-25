@@ -23,7 +23,7 @@ pattern = '*.tif'; % select files that match the pattern
 % files
 fn = dir(fullfile(folder, pattern));
 summary =  [];
-for k = 1:length(fn)
+for k = 7:length(fn)
     if (isempty(strfind(fn(k).name, 'PMT')))
         
     % read image with cut position
