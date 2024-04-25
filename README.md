@@ -17,7 +17,7 @@ Mechanical stress combines with planar polarised patterning during metaphase to 
 doi: https://doi.org/10.1101/2023.07.12.548728
 
 
-# external dependency
+### external dependency
 The source code provided in the folder extrn belongs to Visesh Chari.
 Please cite the following publication:
 Thomas Brox, Andres Bruhn, Nils Papenberg, Joachim Weickert,
