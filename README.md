@@ -3,7 +3,8 @@ Computes optical flow statistics for ablation data in microscopy images
 
 The position of the ablation available computed from a screenshot (the name of the file starts with AP or DV).
 The cut is identified and a region of interest is defined around the cut.
-
+![Ablation detection](Cut.png)
+![ROI](ROI.png)
 Optical flow is computed (Lukas-Kanade algorithm or Brox). The component orhogonal to the cut is calculated.
 Mean values inside the ROI are computed (for all and for bright pixels) and  written in a file called Summary.csv in the folder \dara\Result.
 
