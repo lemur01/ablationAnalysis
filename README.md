@@ -1,4 +1,7 @@
 # Post-ablation image analysis
+
+[![DOI](https://zenodo.org/badge/791883805.svg)](https://zenodo.org/doi/10.5281/zenodo.11068961)
+
 Computes optical flow statistics for ablation data in microscopy images
 
 The position of the ablation available computed from a screenshot (the name of the file starts with AP or DV).
