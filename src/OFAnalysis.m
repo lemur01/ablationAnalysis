@@ -11,7 +11,7 @@ totT = 30       % analyse first tot timepoinmts at most
 %% Data 
 
 % folder with input data
-folder = ".\Data"
+folder = "..\Data"
 
 % result folder
 resF = fullfile(folder,'Results')
