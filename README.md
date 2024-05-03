@@ -4,7 +4,7 @@
 
 Computes optical flow statistics for ablation data in microscopy images
 
-The position of the ablation available computed from a screenshot (the name of the file starts with AP or DV).
+The position of the ablation available computed from a screenshot (the name of the file starts with AP or DV indicating the orientation of the cut).
 The cut is identified and a region of interest is defined around the cut.
 
 <img src=src/Cut.png width="300" height="300"><img src=src/ROI.png width="300" height="300">
@@ -20,7 +20,7 @@ Guy B. Blanchard, Elena Scarpa, Leila Muresan, Bénédicte Sanson
 Mechanical stress combines with planar polarised patterning during metaphase to orient embryonic epithelial cell divisions
 doi: https://doi.org/10.1101/2023.07.12.548728
 
-The code was tested with Matlab 2022a. An exmple dataset is provided to be run with the script OFAnalysis.m . 
+The code was tested with Matlab 2022a. An example dataset is provided to be run with the script OFAnalysis.m . 
 
 ### external dependency
 The source code provided in the folder extrn belongs to Visesh Chari.
